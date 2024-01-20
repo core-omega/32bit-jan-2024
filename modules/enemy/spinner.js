@@ -1,6 +1,5 @@
 class SpinnerEnemy {
     constructor(config) {
-        console.log("[spinner] Creating new spinner enemy.");
         config = (config) ? config : { };
         this.type = 'spinner';
         this.speed = (config.speed) ? config.speed : 70;
@@ -19,6 +18,11 @@ class SpinnerEnemy {
         // change things up a little bit ...
         this.angularVelocity = Math.floor(this.angularVelocity * (0.8 + Math.random() * 0.4));
         this.speed = Math.floor(this.speed * (0.8 + Math.random() * 0.4));
+    }
+
+    resetPosition() {
+        this.sprite.x = Math.floor(Math.random() * 720) + 40;
+        this.sprite.y = Math.floor(Math.random() * 280) + 20;
     }
 
     distance(p1, p2) {
@@ -98,7 +102,7 @@ class SpinnerEnemy {
                 }, 1000);
             }
             else if(this.distance(player, this.sprite) < this.hitRadius) {
-                console.log("Ship goes BOOM!");
+                this.scene.destroyShip();
             }
         }
     }

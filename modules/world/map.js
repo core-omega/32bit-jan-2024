@@ -30,6 +30,12 @@ class GameRoom {
         }
     }
 
+    resetRoom() {
+        for(var i = 0; i < this.enemies.length; ++i) {
+            this.enemies[i].resetPosition();
+        }
+    }
+
     getRandomEnemyType() {
         return SpinnerEnemy;
     }

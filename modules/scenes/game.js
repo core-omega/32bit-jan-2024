@@ -86,6 +86,7 @@ class GameScene extends Phaser.Scene {
         this.ship.setDrag(GameScene.SHIP_DRAG);
         this.ship.setDepth(1);
         this.ship.lastShot = window.performance.now(); 
+        this.ship.lives = 3;
 
         this.ship.energy = new Gauge({
             x: 770,
@@ -122,12 +123,32 @@ class GameScene extends Phaser.Scene {
         this.keyQ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
         this.keyE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
         this.keySpace = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+        this.keyEnter = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
 
         this.createBoundingLights();
 
         this.introText = this.add.text(300, 300, "Mission Start: Clear the Sector", {
             fontFamily: 'monospace'
         });
+
+        this.livesSprite = this.add.sprite(28, 45, 'sprite.ship');
+
+        this.livesText = this.add.text(40, 40, "x 3", {
+            fontFamily: 'monospace',
+            fontSize: '10px'
+        });
+
+        this.deathText = this.add.text(300, 300, "Ship destroyed - press ENTER to launch another.", {
+            fontFamily: 'monospace',
+            fontSize: '12px'
+        });
+        this.deathText.setVisible(false);
+
+        this.gameOverText = this.add.text(380, 300, "Game over, man.", {
+            fontFamily: 'monospace',
+            fontSize: '12px'
+        });
+        this.gameOverText.setVisible(false);
 
         this.controlsText = this.add.text(250, 30, "W, A, S, D - move.  Q - shield.  E - enter wormhole.  SPACE - shoot.", {
             fontFamily: 'sans-serif',
@@ -137,6 +158,19 @@ class GameScene extends Phaser.Scene {
     }
 
     update() {
+        if(this.ship.isDead && this.ship.lives > 0) {
+            this.deathText.setVisible(true);
+            this.gameOverText.setVisible(false);
+        }
+        else if(this.ship.isDead) {
+            this.deathText.setVisible(false);
+            this.gameOverText.setVisible(true);
+        }
+        else {
+            this.deathText.setVisible(false);
+            this.gameOverText.setVisible(false);
+        }
+
         this.sector.update();
         this.performance.update();
 
@@ -165,6 +199,40 @@ class GameScene extends Phaser.Scene {
 
         this.ship.energy.update();
         this.ship.shield.update();
+    }
+
+    destroyShip() {
+        if(this.ship.isDying || this.ship.isDead) {
+            return;
+        }
+        console.log("[game-scene] Triggering ship destruction: lives remaining = " + this.ship.lives);
+        this.ship.isDying = true;
+        this.ship.setVisible(false);
+        this.setInputLock(true);
+        this.ship.explosion = this.add.particles(this.ship.x, this.ship.y, 'particle.red', {
+            blendMode: 'ADD',
+            quantity: 5,
+            speed: 40,
+            lifespan: 1000
+        });
+        let audio = this.sound.add('sound.explosion', {
+            volume: 1
+        });
+        audio.play();
+        setTimeout(() => {
+            this.ship.explosion.destroy();
+            this.ship.isDead = true;
+            this.livesText.destroy();
+            this.livesText = this.add.text(40, 40, "x " + this.ship.lives, {
+                fontFamily: 'monospace',
+                fontSize: '10px'
+            });
+
+        }, 1000);
+        this.ship.lives --;
+        if(this.ship.lives <= 0) {
+            console.log("[game-scene] Game over, man.");
+        }
     }
 
     updateProjectiles() {
@@ -217,6 +285,20 @@ class GameScene extends Phaser.Scene {
     }
 
     handleInput() {
+        // Need to check for this before the input lock.
+        if(this.keyEnter.isDown) {
+            if(this.ship.isDead && this.ship.lives > 0) {
+                console.log("[game-scene] Launching new ship ...");
+                this.ship.x = 400;
+                this.ship.y = 500;
+                this.sector.active.resetRoom();
+                this.ship.setVisible(true);
+                this.setInputLock(false);
+                this.ship.isDying = false;
+                this.ship.isDead = false;
+            }
+        }
+
         if(this.inputLock) {
             return;
         }

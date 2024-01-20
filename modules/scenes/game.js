@@ -13,7 +13,7 @@ class GameScene extends Phaser.Scene {
     static SHIP_ACCELERATION_FACTOR = 80;
     static SHIP_ROTATION_FACTOR = 240;
     static SHIP_SHOOT_RATE = 0.10;
-    static SHIP_SHOT_COST = 5.0;
+    static SHIP_SHOT_COST = 15.0;
     static SHIP_HOMING_COST = 20.0;
     static SHIP_BEAM_COST = 40.0;
     static SHIP_SCALE = 2.0;
@@ -25,15 +25,19 @@ class GameScene extends Phaser.Scene {
     preload() {
         this.load.image('sprite.ship', 'sprite/32b_ship.png');
         this.load.image('sprite.wormhole', 'sprite/32b_wormhole.png');
+        this.load.image('enemy.spinner', 'sprite/32b_enemy_spinner.png');
         this.load.image('background.planet', 'sprite/32b_s1_planet_bg_r2.png');
         this.load.image('background.stars1', 'sprite/32b_s1_stars_bg.png');
         this.load.image('particle.lightblue', 'particle/lightblue16.png');
         this.load.image('particle.blue', 'particle/blue16.png');
         this.load.image('particle.offwhite', 'particle/offwhite16.png');
+        this.load.image('particle.red', 'particle/red16.png');
         this.load.audio('music.stage1', 'music/Stage_1/Stage_1.wav');
         this.load.audio('sound.shot', 'sound/Shot.wav');
         this.load.audio('sound.shield', 'sound/Shield.wav');
         this.load.audio('sound.wormhole', 'sound/Wormhole.wav');
+        this.load.audio('sound.hit', 'sound/Hit.wav');
+        this.load.audio('sound.explosion', 'sound/Explode.wav');
         this.performance = GetPerformanceMonitor();
     }
 
@@ -166,6 +170,7 @@ class GameScene extends Phaser.Scene {
     updateProjectiles() {
         for(let projectile of this.projectiles) {
             projectile.update();
+            projectile.checkHits(this.ship, this.sector.active.enemies);
         }
 
         for(var i = this.projectiles.length - 1; i >= 0; --i) {

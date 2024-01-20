@@ -1,0 +1,5 @@
+class SprayerEnemy {
+
+}
+
+export {SprayerEnemy}

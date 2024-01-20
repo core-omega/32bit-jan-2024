@@ -1,14 +1,37 @@
 import {GameScene} from '../scenes/game.js'
+import { SpinnerEnemy } from '../enemy/spinner.js';
+import { SprayerEnemy } from '../enemy/sprayer.js';
 
 class GameRoom {
     constructor(config) {
         config = (config) ? config : { };
         this.bgref = (config.bgref) ? config.bgref : this.getRandomBackground();
+        let cleared = (config.cleared) ? config.cleared : false;
         this.id = 'Region ' + this.makeId(2) + '-' + this.makeId(4);
         this.exits = [null];
         this.enemies = [];
         this.exitSprites = [];
         this.hasCleared = false;
+
+        console.log("Created new region: " + this.id);
+
+        if(!cleared) {
+            let numEnemies = Math.floor(Math.random() * 6) + 2;
+            console.log("[game-map] Generating " + numEnemies + " enemies for region.");
+            for(var i = 0; i < numEnemies; ++i) {
+                this.enemies.push(new (this.getRandomEnemyType())({ }));
+            }
+        }
+    }
+
+    create(scene) {
+        for(var i = 0; i < this.enemies.length; ++i) {
+            this.enemies[i].create(scene);
+        }
+    }
+
+    getRandomEnemyType() {
+        return SpinnerEnemy;
     }
 
     isClear() {
@@ -38,6 +61,18 @@ class GameRoom {
         this.exits.push(newRoom);
     }
 
+    update() {
+        for(var i = 0; i < this.enemies.length; ++i) {
+            this.enemies[i].update();
+        }
+
+        for(var i = this.enemies.length - 1; i >= 0; --i) {
+            if(this.enemies[i].isDead) {
+                this.enemies.splice(i, 1);
+            }
+        }
+    }
+
 }
 
 class GameMap {
@@ -60,7 +95,10 @@ class GameMap {
         let numRooms = Math.floor(Math.random() * (GameMap.RNG_ROOMS + 1)) + GameMap.MIN_ROOMS;
         let roomIndices = [];
         console.log("[game-map] Creating floor with " + numRooms + " rooms.");
-        this.rooms.push(new GameRoom({bgref: 'background.planet'}));
+        this.rooms.push(new GameRoom({
+            bgref: 'background.planet', 
+            cleared: true
+        }));
         for(var i = 1; i < numRooms; ++i) {
             this.rooms.push(new GameRoom({}));
             roomIndices.push(i);
@@ -87,13 +125,15 @@ class GameMap {
         this.scene = scene;
         this.background = scene.add.sprite(400, 300, this.active.bgref);
         this.background.setDepth(-1);
-        console.log("[game-map] Creating new map.");
+        console.log("[game-map] Created new map.");
         this.wormholeActive = false;
         
         this.regionText = this.scene.add.text(20, 20, this.active.id, {
             fontFamily: 'monospace',
             fontSize: '10px'
         });
+
+        this.active.create(scene);
     }
 
     move(newRoom) {
@@ -133,6 +173,8 @@ class GameMap {
             fontFamily: 'monospace',
             fontSize: '10px'
         });
+
+        this.active.create(this.scene);
     }
 
     activateWormhole(whId) {
@@ -149,6 +191,8 @@ class GameMap {
     }
 
     update() {
+        this.active.update();
+
         if(this.active.isClear() && !this.active.hasCleared) {
             console.log('[game-map] Room cleared.');
             this.active.hasCleared = true;

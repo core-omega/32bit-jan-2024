@@ -1,5 +1,5 @@
 class Shield {
-    static SHIELD_DURATION = 1.0;
+    static SHIELD_DURATION = 0.75;
 
     constructor(config) {
         config = (config) ? config : { };

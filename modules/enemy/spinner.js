@@ -43,7 +43,7 @@ class SpinnerEnemy {
         this.life -= projectile.damage;
         if(this.life <= 0) {
             this.isDying = true;
-            this.emitter = this.scene.add.particles(this.sprite.x, this.sprite.y, this.texref, {
+            this.emitter = this.scene.add.particles(this.sprite.x, this.sprite.y, 'particle.blue', {
                 blendMode: 'ADD',
                 speed: 50,
                 lifespan: 750

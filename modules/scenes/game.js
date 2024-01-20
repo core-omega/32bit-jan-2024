@@ -26,6 +26,7 @@ class GameScene extends Phaser.Scene {
         this.load.image('sprite.ship', 'sprite/32b_ship.png');
         this.load.image('sprite.wormhole', 'sprite/32b_wormhole.png');
         this.load.image('enemy.spinner', 'sprite/32b_enemy_spinner.png');
+        this.load.image('enemy.sprayer', 'sprite/32b_enemy_sprayer.png');
         this.load.image('background.planet', 'sprite/32b_s1_planet_bg_r2.png');
         this.load.image('background.stars1', 'sprite/32b_s1_stars_bg.png');
         this.load.image('particle.lightblue', 'particle/lightblue16.png');
@@ -201,6 +202,10 @@ class GameScene extends Phaser.Scene {
         this.ship.shield.update();
     }
 
+    onShotHit() {
+        this.destroyShip();   
+    }
+
     destroyShip() {
         if(this.ship.isDying || this.ship.isDead) {
             return;
@@ -235,6 +240,12 @@ class GameScene extends Phaser.Scene {
         }
     }
 
+    clearProjectiles() {
+        for(let projectile of this.projectiles) {
+            projectile.kill();
+        }
+    }
+
     updateProjectiles() {
         for(let projectile of this.projectiles) {
             projectile.update();
@@ -263,7 +274,7 @@ class GameScene extends Phaser.Scene {
                     scene: this,
                     position: position
                 });
-                this.projectiles.push(projectile);
+                this.addProjectile(projectile);
                 this.ship.lastShot = window.performance.now();
                 let audio = this.sound.add('sound.shot', {
                     volume: 1
@@ -271,6 +282,10 @@ class GameScene extends Phaser.Scene {
                 audio.play();
             }
         }
+    }
+
+    addProjectile(projectile) {
+        this.projectiles.push(projectile);
     }
 
     setInputLock(value) {
@@ -296,6 +311,7 @@ class GameScene extends Phaser.Scene {
                 this.setInputLock(false);
                 this.ship.isDying = false;
                 this.ship.isDead = false;
+                this.clearProjectiles();
             }
         }
 

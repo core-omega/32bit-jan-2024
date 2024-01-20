@@ -31,10 +31,15 @@ class Projectile {
         return this.alive;
     }
 
+    kill() {
+        this.forceKill = true;
+    }
+
     init(config) {
         config = (config) ? config : { };
         this.type = (config.type) ? config.type : Projectile.TYPE_SHOT;
-        this.isPlayerOwned = (config.isPlayerOwned) ? config.isPlayerOwned : true;
+        this.lifetime = (config.lifetime) ? config.lifetime : Projectile.SHOT_LIFE;
+        this.isPlayerOwned = (config.isPlayerOwned !== undefined) ? config.isPlayerOwned : true;
         this.rotation = (config.rotation) ? config.rotation : 0;
         this.rotation += Math.PI / 2;  // because we want top of unit circle = 0
         this.scene = (config.scene) ? config.scene : null;
@@ -44,6 +49,7 @@ class Projectile {
         this.x = (config.position) ? config.position.x : 0;
         this.y = (config.position) ? config.position.y : 0;
         this.texref = (config.texref) ? config.texref : 'particle.lightblue';
+        this.bouncetexref = (config.bouncetexref) ? config.bouncetexref : 'particle.offwhite';
 
         this.emitter = this.scene.add.particles(this.x, this.y, this.texref, {
             blendMode: 'ADD',
@@ -57,17 +63,18 @@ class Projectile {
         this.poly = this.scene.add.circle(this.x, this.y, 2, 0xefefef);
         this.poly.rotation = this.rotation;
 
-        this.xSpeed = Math.cos(this.poly.rotation - Math.PI) * Projectile.SHOT_SPEED_DEFAULT;
-        this.ySpeed = Math.sin(this.poly.rotation - Math.PI) * Projectile.SHOT_SPEED_DEFAULT;
+        this.xSpeed = Math.cos(this.poly.rotation - Math.PI) * this.speed;
+        this.ySpeed = Math.sin(this.poly.rotation - Math.PI) * this.speed;
         this.lastUpdate = window.performance.now();
         this.created = window.performance.now();
         this.alive = true;
         this.hasHit = false;
+        this.forceKill = false;
     }
 
     update() {
         let lived = (window.performance.now() - this.created) / 1000.0;
-        if(lived > Projectile.SHOT_LIFE || this.hasHit) {
+        if(lived > this.lifetime || this.hasHit || this.forceKill) {
             this.emitter.destroy();
             this.poly.destroy();
             this.alive = false;
@@ -99,7 +106,24 @@ class Projectile {
             }
         }
         else {
+            if(this.distance(this.poly, player) < Projectile.SHOT_HIT_RADIUS) {
+                if(player.shield.isActive()) {
+                    this.isPlayerOwned = true;
+                    this.xSpeed = -this.xSpeed;
+                    this.ySpeed = -this.ySpeed;
 
+                    this.emitter.destroy();
+                    this.emitter = this.scene.add.particles(this.poly.x, this.poly.y, this.bouncetexref, {
+                        blendMode: 'ADD',
+                        speed: 50,
+                        maxAliveParticles: 10,
+                        lifespan: 50
+                    });
+                }
+                else if(this.scene.onShotHit()) {
+                    this.hasHit = true;
+                }
+            }
         }
     }
 }

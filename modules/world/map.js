@@ -133,6 +133,16 @@ class GameMap {
         this.active = this.rooms[0];
     }
 
+    allClear() {
+        let allClear = true;
+        for(var i = 0; i < this.rooms.length; ++i) {
+            if(!this.rooms[i].isClear()) {
+                allClear = false;
+            }
+        }
+        return allClear;
+    }
+
     create(scene) {
         this.createMap();
         this.scene = scene;
@@ -153,6 +163,7 @@ class GameMap {
         this.background.destroy();
 
         this.wormholeActive = false;
+        this.scene.clearProjectiles();
         this.scene.setInputLock(false);
         this.scene.ship.rebuildSprite();
 
@@ -195,8 +206,16 @@ class GameMap {
         audio.play();
         this.wormholeActive = true;
         this.scene.setInputLock(true);
-        setTimeout(() => {
-            this.move(this.active.exits[whId]);
+        setTimeout(() => {            
+            if(this.allClear()) {
+                console.log("[game-map] All clear - moving to summary scene.");
+                this.scene.winner();
+                this.scene.audio.stop();
+                this.scene.scene.start('scene.summary');
+            }
+            else {
+                this.move(this.active.exits[whId]);
+            }
         }, 2000);
     }
 

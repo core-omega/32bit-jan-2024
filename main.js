@@ -1,6 +1,7 @@
 import * as Phaser from 'phaser';
-import {TitleScene} from "./modules/scenes/title.js"
-import {GameScene} from "./modules/scenes/game.js"
+import {TitleScene} from "./modules/scenes/title.js";
+import {GameScene} from "./modules/scenes/game.js";
+import {SummaryScene} from "./modules/scenes/summary.js";
 import { ForceHideOverlay, ForceShowOverlay } from './modules/display/show.js';
 
 function StartGame() {
@@ -8,7 +9,7 @@ function StartGame() {
         type: Phaser.AUTO,
         width: 800,
         height: 600,
-        scene: [TitleScene, GameScene],
+        scene: [TitleScene, GameScene, SummaryScene],
         scale: {
             mode: Phaser.Scale.FIT,
             autoCenter: Phaser.Scale.CENTER_BOTH

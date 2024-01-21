@@ -12,8 +12,10 @@ class PlayerShip {
         this.drag = (config.drag) ? config.drag : 100;
         this.acceleration = (config.acceleration) ? config.acceleration : 80;
         this.rotation = (config.rotation) ? config.rotation : 240;
-        this.shotCost = (config.shotCost) ? config.shotCost : 15.0;
+        this.shotCost = (config.shotCost) ? config.shotCost : 10.0;
         this.shotRate = (config.shotRate) ? config.shotRate : 0.10;
+        this.lives = (config.lives) ? config.lives : 3;
+
         this.lastShot = window.performance.now();
     }
 
@@ -30,7 +32,6 @@ class PlayerShip {
         this.sprite.lives = 3;
         this.isDead = false;
         this.isDying = false;
-        this.lives = 3;
 
         this.energy = new Gauge({
             x: 770,
@@ -53,7 +54,7 @@ class PlayerShip {
 
     addLives(lives) {
         this.lives += lives;
-        this.scene.updateLives();
+        this.scene.updateLives(this.lives);
     }
 
     rebuildSprite() {

@@ -1,9 +1,9 @@
 class Shield {
-    static SHIELD_DURATION = 0.50;
+    static SHIELD_DURATION = 0.10;
 
     constructor(config) {
         config = (config) ? config : { };
-        this.drain = (config.drain) ? config.drain : 35;
+        this.drain = (config.drain) ? config.drain : 7;
         this.texref = (config.texref) ? config.texref : "particle.lightblue";
     }
 
@@ -40,7 +40,7 @@ class Shield {
         this.lastActivation = window.performance.now();
         this.ship.energy.use(this.drain);
         let audio = this.scene.sound.add('sound.shield', {
-            volume: 1
+            volume: 0.2
         });
         audio.play();
     }

@@ -100,9 +100,17 @@ class Projectile {
 
         if(this.isPlayerOwned) {
             for(var i = 0; i < enemies.length; ++i) {
-                if(this.distance(this.poly, enemies[i].sprite) < Projectile.SHOT_HIT_RADIUS) {
+                if(this.distance(this.poly, enemies[i].sprite) < enemies[i].hitRadius) {
                     if(enemies[i].onShotHit(this)) {
                         this.hasHit = true;
+                    }
+                }
+                // Terminal homing for the win!
+                else if(this.distance(this.poly, enemies[i].sprite) < enemies[i].hitRadius * 1.6) {
+                    if(!enemies[i].isDying && !enemies[i].isDead) {
+                        let angle = Math.atan2((this.poly.y - enemies[i].sprite.y), (this.poly.x - enemies[i].sprite.x));
+                        this.xSpeed = Math.cos(angle - Math.PI) * this.speed;
+                        this.ySpeed = Math.sin(angle - Math.PI) * this.speed;    
                     }
                 }
             }

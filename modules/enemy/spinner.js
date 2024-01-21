@@ -10,7 +10,7 @@ class SpinnerEnemy {
         this.scale = (config.scale) ? config.scale : [0.5, 0.5];
         this.x = (config.x) ? config.x : Math.floor(Math.random() * 720) + 40;
         this.y = (config.y) ? config.y : Math.floor(Math.random() * 280 ) + 20;
-        this.hitRadius = (config.hitRadius) ? config.hitRadius : 15;
+        this.hitRadius = (config.hitRadius) ? config.hitRadius : 16;
         this.angularVelocity = (config.angularVelocity) ? config.angularVelocity : 480;
         this.stunned = false;
         this.life = 10;

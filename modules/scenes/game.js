@@ -80,7 +80,7 @@ class GameScene extends Phaser.Scene {
 
         this.projectiles = [];
         this.enemies = [];
-        this.ship = new PlayerShip({ });
+        this.ship = new PlayerShip({ lives: 10 });
         this.ship.create(this);
         
         this.sector = new GameMap({ });
@@ -97,7 +97,7 @@ class GameScene extends Phaser.Scene {
 
         this.livesSprite = this.add.sprite(28, 65, 'sprite.ship');
 
-        this.livesText = this.add.text(40, 60, "x 3", {
+        this.livesText = this.add.text(40, 60, "x ", {
             fontFamily: 'monospace',
             fontSize: '10px'
         });
@@ -125,6 +125,15 @@ class GameScene extends Phaser.Scene {
         });
 
         this.score = (window.score) ? window.score : 0;
+        if(window.score) {
+            delete window.score;
+        }
+        this.addScore(0);
+        this.ship.addLives(0);
+    }
+
+    winner() {
+        window.score = this.score;
     }
 
     updateLives(lives) {

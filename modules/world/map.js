@@ -1,6 +1,7 @@
 import {GameScene} from '../scenes/game.js'
 import { SpinnerEnemy } from '../enemy/spinner.js';
 import { SprayerEnemy } from '../enemy/sprayer.js';
+import { ThresherEnemy } from '../enemy/thresher.js';
 
 class GameRoom {
     constructor(config) {
@@ -37,7 +38,10 @@ class GameRoom {
     }
 
     getRandomEnemyType() {
-        if(Math.random() < 0.75) {
+        if(Math.random() < 0.10) {
+            return ThresherEnemy;
+        }
+        else if(Math.random() < 0.75) {
             return SpinnerEnemy;
         }
         return SprayerEnemy;

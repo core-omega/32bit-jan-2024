@@ -17,6 +17,7 @@ class GameScene extends Phaser.Scene {
         this.load.image('sprite.wormhole', 'sprite/32b_wormhole.png');
         this.load.image('enemy.spinner', 'sprite/32b_enemy_spinner.png');
         this.load.image('enemy.sprayer', 'sprite/32b_enemy_sprayer.png');
+        this.load.image('enemy.thresher', 'sprite/32b_enemy_thresher.png');
         this.load.image('background.planet', 'sprite/32b_s1_planet_bg_r2.png');
         this.load.image('background.stars1', 'sprite/32b_s1_stars_bg.png');
         this.load.image('particle.lightblue', 'particle/lightblue16.png');
@@ -107,7 +108,7 @@ class GameScene extends Phaser.Scene {
         });
         this.deathText.setVisible(false);
 
-        this.gameOverText = this.add.text(380, 300, "Game over, man.", {
+        this.gameOverText = this.add.text(280, 300, "Game over, man.  Press ENTER to try a different sector.", {
             fontFamily: 'monospace',
             fontSize: '12px'
         });
@@ -123,7 +124,11 @@ class GameScene extends Phaser.Scene {
             fontSize: '10px'
         });
 
-        this.score = 0;
+        this.score = (window.score) ? window.score : 0;
+    }
+
+    updateLives(lives) {
+        this.livesText.setText("x " + lives);
     }
 
     addScore(value) {
@@ -224,6 +229,11 @@ class GameScene extends Phaser.Scene {
                 this.ship.isDying = false;
                 this.ship.isDead = false;
                 this.clearProjectiles();
+            }
+            else if(this.ship.lives == 0) {
+                console.log("[game-scene] Generating new sector ...");
+                this.audio.stop();
+                this.scene.restart();
             }
         }
 

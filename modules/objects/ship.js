@@ -51,6 +51,11 @@ class PlayerShip {
         this.keySpace = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
     }
 
+    addLives(lives) {
+        this.lives += lives;
+        this.scene.updateLives();
+    }
+
     rebuildSprite() {
         this.sprite.setScale(this.scene.ship.scale, this.scene.ship.scale);
         this.sprite.rotation = 0;
@@ -75,7 +80,7 @@ class PlayerShip {
         this.scene.setInputLock(true);
         this.explosion = this.scene.add.particles(this.sprite.x, this.sprite.y, 'particle.red', {
             blendMode: 'ADD',
-            quantity: 5,
+            quantity: 7,
             speed: 40,
             lifespan: 1000
         });
@@ -83,17 +88,12 @@ class PlayerShip {
             volume: 1
         });
         audio.play();
+        this.lives --;
         setTimeout(() => {
             this.explosion.destroy();
             this.isDead = true;
-            this.scene.livesText.destroy();
-            this.scene.livesText = this.scene.add.text(40, 60, "x " + this.lives, {
-                fontFamily: 'monospace',
-                fontSize: '10px'
-            });
-
+            this.scene.updateLives(this.lives);
         }, 1000);
-        this.lives --;
         if(this.lives <= 0) {
             console.log("[ship] Game over, man.");
         }

@@ -80,7 +80,7 @@ class SpinnerEnemy {
 
         let player = this.scene.ship;
 
-        let angle = Math.atan2((this.sprite.y - player.y), this.sprite.x - player.x);
+        let angle = Math.atan2((this.sprite.y - player.sprite.y), this.sprite.x - player.sprite.x);
         
         let x = Math.cos(angle);
         let y = Math.sin(angle);
@@ -94,14 +94,14 @@ class SpinnerEnemy {
             this.sprite.setAngularVelocity(this.angularVelocity);
         }
 
-        if(this.distance(player, this.sprite) < this.hitRadius * 1.5) {
+        if(this.distance(player.sprite, this.sprite) < this.hitRadius * 1.5) {
             if(player.shield.isActive()) {
                 this.stunned = true;
                 setTimeout(() => {
                     this.stunned = false;
                 }, 1000);
             }
-            else if(this.distance(player, this.sprite) < this.hitRadius) {
+            else if(this.distance(player.sprite, this.sprite) < this.hitRadius) {
                 this.scene.destroyShip();
             }
         }

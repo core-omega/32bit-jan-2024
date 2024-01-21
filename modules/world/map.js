@@ -150,10 +150,7 @@ class GameMap {
 
         this.wormholeActive = false;
         this.scene.setInputLock(false);
-        this.scene.ship.setScale(GameScene.SHIP_SCALE, GameScene.SHIP_SCALE);
-        this.scene.ship.rotation = 0;
-        this.scene.ship.x = 400;
-        this.scene.ship.y = 500;
+        this.scene.ship.rebuildSprite();
 
         for(var i = 0; i < 4; ++i) {
             if(this.active.exitSprites[i]) {
@@ -219,13 +216,13 @@ class GameMap {
         }
 
         if(this.wormholeActive) {
-            this.scene.ship.rotation += 0.2;
-            this.scene.ship.setScale(this.scene.ship.scaleX * 0.97, this.scene.ship.scaleY * 0.97);
+            this.scene.ship.sprite.rotation += 0.2;
+            this.scene.ship.sprite.setScale(this.scene.ship.sprite.scaleX * 0.97, this.scene.ship.sprite.scaleY * 0.97);
         }
         else if(this.scene.keyE.isDown) {
             if(this.active.isClear() && !this.wormholeActive) {
                 for(var i = 0; i < this.active.exitSprites.length; ++i) {
-                    if(this.distance(this.active.exitSprites[i], this.scene.ship) < GameMap.WORMHOLE_MIN_ACTIVATION_DISTANCE) {
+                    if(this.distance(this.active.exitSprites[i], this.scene.ship.sprite) < GameMap.WORMHOLE_MIN_ACTIVATION_DISTANCE) {
                         this.activateWormhole(i);
                     }
                 }

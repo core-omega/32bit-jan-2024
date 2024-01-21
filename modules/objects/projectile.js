@@ -106,7 +106,7 @@ class Projectile {
             }
         }
         else {
-            if(this.distance(this.poly, player) < Projectile.SHOT_HIT_RADIUS) {
+            if(this.distance(this.poly, player.sprite) < Projectile.SHOT_HIT_RADIUS) {
                 if(player.shield.isActive()) {
                     this.isPlayerOwned = true;
                     this.xSpeed = -this.xSpeed;

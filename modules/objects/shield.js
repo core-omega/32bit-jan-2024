@@ -1,9 +1,9 @@
 class Shield {
-    static SHIELD_DURATION = 0.75;
+    static SHIELD_DURATION = 0.50;
 
     constructor(config) {
         config = (config) ? config : { };
-        this.drain = (config.drain) ? config.drain : 15;
+        this.drain = (config.drain) ? config.drain : 35;
         this.texref = (config.texref) ? config.texref : "particle.lightblue";
     }
 
@@ -46,8 +46,8 @@ class Shield {
     }
 
     update() {
-        this.emitter.x = this.ship.x;
-        this.emitter.y = this.ship.y;
+        this.emitter.x = this.ship.sprite.x;
+        this.emitter.y = this.ship.sprite.y;
         let duration = (window.performance.now() - this.lastActivation) / 1000.0;
         if(this.active && duration > Shield.SHIELD_DURATION) {
             this.active = false;

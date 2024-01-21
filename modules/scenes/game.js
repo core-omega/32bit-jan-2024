@@ -1,22 +1,14 @@
 import * as Phaser from 'phaser';
 import { Gauge } from '../display/gauge.js';
 import { Projectile } from '../objects/projectile.js';
+import { PlayerShip } from '../objects/ship.js';
 import { Shield } from "../objects/shield.js";
 import { GetPerformanceMonitor } from '../utility/performance.js';
 import { GameMap } from '../world/map.js';
 
 class GameScene extends Phaser.Scene {
 
-    static SHIP_MAX_VELOCITY = 100;
-    static SHIP_ANGULAR_DRAG = 100;
-    static SHIP_DRAG = 100;
-    static SHIP_ACCELERATION_FACTOR = 80;
-    static SHIP_ROTATION_FACTOR = 240;
-    static SHIP_SHOOT_RATE = 0.10;
-    static SHIP_SHOT_COST = 15.0;
-    static SHIP_HOMING_COST = 20.0;
-    static SHIP_BEAM_COST = 40.0;
-    static SHIP_SCALE = 2.0;
+
 
     constructor( ...args ) {
         super({ key: 'scene.game', ...args });
@@ -78,28 +70,6 @@ class GameScene extends Phaser.Scene {
         });
     }
 
-    createShip() {
-        this.ship = this.physics.add.image(400, 500, 'sprite.ship');
-        this.ship.setMaxVelocity(GameScene.SHIP_MAX_VELOCITY, GameScene.SHIP_MAX_VELOCITY);
-        this.ship.setScale(GameScene.SHIP_SCALE, GameScene.SHIP_SCALE);
-        this.ship.setCollideWorldBounds(true);
-        this.ship.setAngularDrag(GameScene.SHIP_ANGULAR_DRAG);
-        this.ship.setDrag(GameScene.SHIP_DRAG);
-        this.ship.setDepth(1);
-        this.ship.lastShot = window.performance.now(); 
-        this.ship.lives = 3;
-
-        this.ship.energy = new Gauge({
-            x: 770,
-            y: 80,
-            label: "EN"
-        });
-        this.ship.energy.create(this);
-
-        this.ship.shield = new Shield({ });
-        this.ship.shield.create(this, this.ship);
-    }
-
     create() {
         this.inputLock = false;
 
@@ -111,20 +81,14 @@ class GameScene extends Phaser.Scene {
 
         this.projectiles = [];
         this.enemies = [];
-        this.createShip();
+        this.ship = new PlayerShip({ });
+        this.ship.create(this);
         
         this.sector = new GameMap({ });
         this.sector.create(this);
 
-        this.cursors = this.input.keyboard.createCursorKeys();
-        this.keyW = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
-        this.keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
-        this.keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
-        this.keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
-        this.keyQ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
-        this.keyE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
-        this.keySpace = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
         this.keyEnter = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
+        this.keyE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);  // FIXME: used by GameMap, not locally.
 
         this.createBoundingLights();
 
@@ -175,8 +139,8 @@ class GameScene extends Phaser.Scene {
         this.sector.update();
         this.performance.update();
 
-        this.ship.setAcceleration(0);
-        this.ship.setAngularVelocity(0);
+        this.ship.sprite.setAcceleration(0);
+        this.ship.sprite.setAngularVelocity(0);
 
         if(this.introText) {
             this.introText.setAlpha(this.introText.alpha * 0.99);
@@ -212,9 +176,9 @@ class GameScene extends Phaser.Scene {
         }
         console.log("[game-scene] Triggering ship destruction: lives remaining = " + this.ship.lives);
         this.ship.isDying = true;
-        this.ship.setVisible(false);
+        this.ship.sprite.setVisible(false);
         this.setInputLock(true);
-        this.ship.explosion = this.add.particles(this.ship.x, this.ship.y, 'particle.red', {
+        this.ship.explosion = this.add.particles(this.ship.sprite.x, this.ship.sprite.y, 'particle.red', {
             blendMode: 'ADD',
             quantity: 5,
             speed: 40,
@@ -260,29 +224,6 @@ class GameScene extends Phaser.Scene {
         }
     }
 
-    fireProjectile() {
-        if(this.ship.energy.canUse(GameScene.SHIP_SHOT_COST)) {
-            let duration = (window.performance.now() - this.ship.lastShot) / 1000.0;
-            if(duration > GameScene.SHIP_SHOOT_RATE) {
-                this.ship.energy.use(GameScene.SHIP_SHOT_COST);
-                let projectile = new Projectile();
-                let position = this.ship.getTopCenter();
-                projectile.init({
-                    type: Projectile.TYPE_SHOT,
-                    isPlayerOwned: true,
-                    rotation: this.ship.rotation,
-                    scene: this,
-                    position: position
-                });
-                this.addProjectile(projectile);
-                this.ship.lastShot = window.performance.now();
-                let audio = this.sound.add('sound.shot', {
-                    volume: 1
-                });
-                audio.play();
-            }
-        }
-    }
 
     addProjectile(projectile) {
         this.projectiles.push(projectile);
@@ -293,21 +234,13 @@ class GameScene extends Phaser.Scene {
         this.inputLock = value;
     }
 
-    activateShield() {
-        if(this.ship.shield.canActivate()) {
-            this.ship.shield.activate();
-        }
-    }
-
     handleInput() {
         // Need to check for this before the input lock.
         if(this.keyEnter.isDown) {
             if(this.ship.isDead && this.ship.lives > 0) {
                 console.log("[game-scene] Launching new ship ...");
-                this.ship.x = 400;
-                this.ship.y = 500;
+                this.ship.rebuildSprite();
                 this.sector.active.resetRoom();
-                this.ship.setVisible(true);
                 this.setInputLock(false);
                 this.ship.isDying = false;
                 this.ship.isDead = false;
@@ -319,35 +252,7 @@ class GameScene extends Phaser.Scene {
             return;
         }
 
-        if (this.cursors.left.isDown || this.keyA.isDown)
-        {
-            this.ship.setAngularVelocity(-GameScene.SHIP_ROTATION_FACTOR);
-        }
-        else if (this.cursors.right.isDown || this.keyD.isDown)
-        {
-            this.ship.setAngularVelocity(GameScene.SHIP_ROTATION_FACTOR);
-        }
-
-        if (this.cursors.up.isDown || this.keyW.isDown)
-        {
-            let x = Math.cos(this.ship.rotation + Math.PI / 2);
-            let y = Math.sin(this.ship.rotation + Math.PI / 2);
-            this.ship.setAcceleration(-GameScene.SHIP_ACCELERATION_FACTOR * x, -GameScene.SHIP_ACCELERATION_FACTOR * y);
-        }
-        else if (this.cursors.down.isDown || this.keyS.isDown)
-        {
-            let x = Math.cos(this.ship.rotation + Math.PI / 2);
-            let y = Math.sin(this.ship.rotation + Math.PI / 2);
-            this.ship.setAcceleration(GameScene.SHIP_ACCELERATION_FACTOR * x, GameScene.SHIP_ACCELERATION_FACTOR * y);
-        }
-
-        if(this.keyQ.isDown) {
-            this.activateShield();
-        }
-
-        if(this.keySpace.isDown) {
-            this.fireProjectile();
-        }
+        this.ship.handleInput();
     }
 
 }

@@ -9,6 +9,8 @@ class Projectile {
     static HOMING_SPEED_DEFAULT = 100;
     static SHOT_LIFE = 3.0;
 
+    static REFLECT_SCORE = 150;
+
     constructor() { }
     
     distance(p1, p2) {
@@ -108,6 +110,7 @@ class Projectile {
         else {
             if(this.distance(this.poly, player.sprite) < Projectile.SHOT_HIT_RADIUS) {
                 if(player.shield.isActive()) {
+                    this.scene.addScore(Projectile.REFLECT_SCORE);
                     this.isPlayerOwned = true;
                     this.xSpeed = -this.xSpeed;
                     this.ySpeed = -this.ySpeed;

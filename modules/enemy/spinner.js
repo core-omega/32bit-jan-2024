@@ -1,4 +1,7 @@
 class SpinnerEnemy {
+    static STUN_SCORE = 100;
+    static KILL_SCORE = 500;
+
     constructor(config) {
         config = (config) ? config : { };
         this.type = 'spinner';
@@ -14,6 +17,7 @@ class SpinnerEnemy {
         this.playDyingAnimation = false;
         this.isDying = false;
         this.isDead = false;
+        this.stunTimeout = 2500;
 
         // change things up a little bit ...
         this.angularVelocity = Math.floor(this.angularVelocity * (0.8 + Math.random() * 0.4));
@@ -58,6 +62,7 @@ class SpinnerEnemy {
                 this.emitter.setQuantity(0);
                 this.emitter.destroy();
                 this.isDead = true;
+                this.scene.addScore(SpinnerEnemy.KILL_SCORE);
             }, 750);
         }
 
@@ -97,9 +102,10 @@ class SpinnerEnemy {
         if(this.distance(player.sprite, this.sprite) < this.hitRadius * 1.5) {
             if(player.shield.isActive()) {
                 this.stunned = true;
+                this.scene.addScore(SpinnerEnemy.STUN_SCORE);
                 setTimeout(() => {
                     this.stunned = false;
-                }, 1000);
+                }, this.stunTimeout);
             }
             else if(this.distance(player.sprite, this.sprite) < this.hitRadius) {
                 this.scene.destroyShip();

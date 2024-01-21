@@ -87,7 +87,7 @@ class PlayerShip {
             this.explosion.destroy();
             this.isDead = true;
             this.scene.livesText.destroy();
-            this.scene.livesText = this.scene.add.text(40, 40, "x " + this.lives, {
+            this.scene.livesText = this.scene.add.text(40, 60, "x " + this.lives, {
                 fontFamily: 'monospace',
                 fontSize: '10px'
             });

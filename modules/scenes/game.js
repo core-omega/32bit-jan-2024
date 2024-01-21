@@ -8,8 +8,6 @@ import { GameMap } from '../world/map.js';
 
 class GameScene extends Phaser.Scene {
 
-
-
     constructor( ...args ) {
         super({ key: 'scene.game', ...args });
     }
@@ -96,9 +94,9 @@ class GameScene extends Phaser.Scene {
             fontFamily: 'monospace'
         });
 
-        this.livesSprite = this.add.sprite(28, 45, 'sprite.ship');
+        this.livesSprite = this.add.sprite(28, 65, 'sprite.ship');
 
-        this.livesText = this.add.text(40, 40, "x 3", {
+        this.livesText = this.add.text(40, 60, "x 3", {
             fontFamily: 'monospace',
             fontSize: '10px'
         });
@@ -116,10 +114,26 @@ class GameScene extends Phaser.Scene {
         this.gameOverText.setVisible(false);
 
         this.controlsText = this.add.text(250, 30, "W, A, S, D - move.  Q - shield.  E - enter wormhole.  SPACE - shoot.", {
-            fontFamily: 'sans-serif',
+            fontFamily: 'monospace',
             fontSize: '10px'
         });
 
+        this.scoreText = this.add.text(20, 40, "Score: 0", {
+            fontFamily: 'monospace',
+            fontSize: '10px'
+        });
+
+        this.score = 0;
+    }
+
+    addScore(value) {
+        this.score += value;
+        this.scoreText.setText("Score: " + this.score);
+    }
+
+    clearScore() {
+        this.score = 0;
+        this.scoreText.setText("Score: " + this.score);
     }
 
     update() {

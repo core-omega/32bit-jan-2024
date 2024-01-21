@@ -1,8 +1,10 @@
 import {Projectile} from '../objects/projectile.js';
 
 class SprayerEnemy {
-    static FIRST_SHOT_DELAY = 2000;
-    static BASE_SHOT_RATE = 1.5;
+    static FIRST_SHOT_DELAY = 1000;
+    static BASE_SHOT_RATE = 1.7;
+    static STUN_SCORE = 100;
+    static KILL_SCORE = 1500;
 
     constructor(config) {
         config = (config) ? config : { };
@@ -23,6 +25,7 @@ class SprayerEnemy {
         this.shotRate = SprayerEnemy.BASE_SHOT_RATE + Math.random();
 
         this.speed = Math.floor(this.speed * (0.8 + Math.random() * 0.4));
+        this.stunTimeout = 2500;
     }
 
     resetPosition() {
@@ -63,6 +66,7 @@ class SprayerEnemy {
                 this.emitter.setQuantity(0);
                 this.emitter.destroy();
                 this.isDead = true;
+                this.scene.addScore(SprayerEnemy.KILL_SCORE);
             }, 750);
         }
 
@@ -124,9 +128,10 @@ class SprayerEnemy {
         if(this.distance(player.sprite, this.sprite) < this.hitRadius * 1.5) {
             if(player.shield.isActive()) {
                 this.stunned = true;
+                this.scene.addScore(SprayerEnemy.STUN_SCORE);
                 setTimeout(() => {
                     this.stunned = false;
-                }, 1000);
+                }, this.stunTimeout);
             }
             else if(this.distance(player.sprite, this.sprite) < this.hitRadius) {
                 this.scene.destroyShip();

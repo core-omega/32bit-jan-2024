@@ -138,9 +138,7 @@ class GameScene extends Phaser.Scene {
 
         this.sector.update();
         this.performance.update();
-
-        this.ship.sprite.setAcceleration(0);
-        this.ship.sprite.setAngularVelocity(0);
+        this.ship.update();
 
         if(this.introText) {
             this.introText.setAlpha(this.introText.alpha * 0.99);
@@ -161,9 +159,6 @@ class GameScene extends Phaser.Scene {
         this.handleInput();
 
         this.updateProjectiles();
-
-        this.ship.energy.update();
-        this.ship.shield.update();
     }
 
     onShotHit() {
@@ -171,37 +166,7 @@ class GameScene extends Phaser.Scene {
     }
 
     destroyShip() {
-        if(this.ship.isDying || this.ship.isDead) {
-            return;
-        }
-        console.log("[game-scene] Triggering ship destruction: lives remaining = " + this.ship.lives);
-        this.ship.isDying = true;
-        this.ship.sprite.setVisible(false);
-        this.setInputLock(true);
-        this.ship.explosion = this.add.particles(this.ship.sprite.x, this.ship.sprite.y, 'particle.red', {
-            blendMode: 'ADD',
-            quantity: 5,
-            speed: 40,
-            lifespan: 1000
-        });
-        let audio = this.sound.add('sound.explosion', {
-            volume: 1
-        });
-        audio.play();
-        setTimeout(() => {
-            this.ship.explosion.destroy();
-            this.ship.isDead = true;
-            this.livesText.destroy();
-            this.livesText = this.add.text(40, 40, "x " + this.ship.lives, {
-                fontFamily: 'monospace',
-                fontSize: '10px'
-            });
-
-        }, 1000);
-        this.ship.lives --;
-        if(this.ship.lives <= 0) {
-            console.log("[game-scene] Game over, man.");
-        }
+        this.ship.destroyShip();
     }
 
     clearProjectiles() {
@@ -230,7 +195,7 @@ class GameScene extends Phaser.Scene {
     }
 
     setInputLock(value) {
-        console.log("Locking input: " + value);
+        console.log("[game-scene] Locking input: " + value);
         this.inputLock = value;
     }
 

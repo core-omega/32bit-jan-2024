@@ -13,11 +13,11 @@ class GameRoom {
         this.exitSprites = [];
         this.hasCleared = false;
 
-        console.log("Created new region: " + this.id);
+        console.log("[game-room] Created new region: " + this.id);
 
         if(!cleared) {
             let numEnemies = Math.floor(Math.random() * 6) + 5;
-            console.log("[game-map] Generating " + numEnemies + " enemies for region.");
+            console.log("[game-room] Generating " + numEnemies + " enemies for region.");
             for(var i = 0; i < numEnemies; ++i) {
                 this.enemies.push(new (this.getRandomEnemyType())({ }));
             }

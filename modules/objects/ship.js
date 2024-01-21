@@ -65,6 +65,40 @@ class PlayerShip {
         }
     }
 
+    destroyShip() {
+        if(this.isDying || this.isDead) {
+            return;
+        }
+        console.log("[game-scene] Triggering ship destruction: lives remaining = " + this.lives);
+        this.isDying = true;
+        this.sprite.setVisible(false);
+        this.scene.setInputLock(true);
+        this.explosion = this.scene.add.particles(this.sprite.x, this.sprite.y, 'particle.red', {
+            blendMode: 'ADD',
+            quantity: 5,
+            speed: 40,
+            lifespan: 1000
+        });
+        let audio = this.scene.sound.add('sound.explosion', {
+            volume: 1
+        });
+        audio.play();
+        setTimeout(() => {
+            this.explosion.destroy();
+            this.isDead = true;
+            this.scene.livesText.destroy();
+            this.scene.livesText = this.scene.add.text(40, 40, "x " + this.lives, {
+                fontFamily: 'monospace',
+                fontSize: '10px'
+            });
+
+        }, 1000);
+        this.lives --;
+        if(this.lives <= 0) {
+            console.log("[ship] Game over, man.");
+        }
+    }
+
     fireProjectile() {
         if(this.energy.canUse(this.shotCost)) {
             let duration = (window.performance.now() - this.lastShot) / 1000.0;
@@ -122,7 +156,10 @@ class PlayerShip {
     }
 
     update() {
-
+        this.sprite.setAcceleration(0);
+        this.sprite.setAngularVelocity(0);
+        this.energy.update();
+        this.shield.update();
     }
 }
 

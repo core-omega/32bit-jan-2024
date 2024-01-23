@@ -6,6 +6,7 @@ Unless otherwise stated, all source code, art, music, and sound effects have bee
 The following fonts were used in 32b_title.png:
 
 GravityRegular5 by John Watson (CC BY 4.0)
+
 FieldGuide by rarelikeaunicorn (CC BY 4.0)
 
 For questions, comments, or concerns regarding any topic, please get in touch with cubic@coreomega.io
